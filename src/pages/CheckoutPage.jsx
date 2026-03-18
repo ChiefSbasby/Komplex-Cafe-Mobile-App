@@ -31,7 +31,7 @@ export default function CheckoutPage() {
     };
 
     return (
-        <div className="menu-page">
+        <div className="checkout-page">
            
             {/* ── Hamburger (always on top) ── */}
             <div className = "nav_background">
@@ -69,9 +69,6 @@ export default function CheckoutPage() {
                     </button>
                     <button className="btn-continue" disabled={cart.length === 0}>
                         Continue
-                        {cart.length > 0 && (
-                        <span className="cart-badge">{cart.length}</span>
-                        )}
                     </button>
                 </div>
             </div>
