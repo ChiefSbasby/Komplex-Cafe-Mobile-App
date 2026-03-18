@@ -1,0 +1,80 @@
+.wrapper {
+  font-family: 'Golos', sans-serif;
+  width: 100%;
+  margin: 0 auto;
+  background-color: white;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+
+/* ---------- Hero ---------- */
+.hero {
+  margin-top:70px;
+  padding-top: 60px;
+  display: flex;
+  height: 160px;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-image: url("../src/assets/head-backdrop.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.hero_text {
+  position:relative;
+  display:block;
+  line-height: 0.5em;
+  margin: 2% 5%;
+}
+
+.hero_title {
+  color: #fff;
+  font-size: 52px;
+  font-weight: bold;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  font-family: "gliker", san-serif;
+}
+
+.hero_tagline {
+  color: #ddd;
+  font-size: 15px;
+  font-family: 'inter', sans-serif;
+  font-style: italic;
+}
+
+
+/* ---------- Contacts ---------- */
+.contacts {
+  padding: 10px 20px 10px 20px;
+  font-family: "Golos", sans-serif;
+}
+
+.contacts_Title {
+  font-weight: bold;
+}
+
+.contacts_email_text {
+  font-weight: bold;
+}
+
+.contacts_socmed_text {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.other_text {
+  margin-top: 10px;
+}
+
+
+@media (max-width: 500px) {
+  .hero_tagline {
+    color: #ddd;
+    font-size: 15px;
+    font-family: 'inter', sans-serif;
+    font-style: italic;
+  }
+}
