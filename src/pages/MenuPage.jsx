@@ -1,16 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { MENU, ADD_ONS, CATEGORIES } from "../assets/data/menuData.js";
 import "../css/MenuPage.css";
-import "../css/NavBar.css";
+import NavBar from "../components/NavBar";
 
 
 import { useNavigate } from "react-router-dom";
-
-const NAV_ROUTES = [
-  { label: "Home",    path: "/" },
-  { label: "Menu",    path: "/menu" },
-  { label: "Contact", path: "/contact" },
-];
 
 /* ─── Placeholder image (grey square SVG) ─────────────────────── */
 const PLACEHOLDER =
@@ -165,50 +159,10 @@ function ItemPopup({ item, group, onClose, onAddToCart }) {
 ═══════════════════════════════════════════════════════════════════ */
 export default function MenuPage() {
 
-  /* ── Nav Bar ── */
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [menuVisible, setMenuVisible] = useState(false);
-  const [closing, setClosing] = useState(false);
-  const [menuExpanded, setMenuExpanded] = useState(false);
-  const MENU_SUBNAV = [
-    {
-      section: "Drinks",
-      categories: ["Coffee", "Non-Coffee", "Frappes", "Fruit Teas"],
-    },
-    {
-      section: "Meals",
-      categories: ["Pasta", "Rice Meals", "Snacks", "Sandwiches"],
-    },
-  ];
-
-  const openMenu = () => {
-    setMenuVisible(true);
-    setMenuOpen(true);
-    setClosing(false);
-  };
-
-  const closeMenu = () => {
-    setClosing(true);
-    setTimeout(() => {
-      setMenuOpen(false);
-      setMenuVisible(false);
-      setClosing(false);
-    }, 280); // match animation duration
-  };
-
-  const toggleMenu = () => {
-    if (menuOpen) closeMenu();
-    else openMenu();
-  };
-
+  
   const navigate = useNavigate();
 
-  const handleNav = (path) => {
-  closeMenu();
-  navigate(path);
-  };
-
-  /* ── Menu ── */
+  /* ── Menu ── */  
 
   const [activeCategory, setActiveCategory] = useState(null);
   const [popup, setPopup] = useState(null); // { item, group }
@@ -230,63 +184,7 @@ export default function MenuPage() {
 
   return (
     <div className="menu-page">
-      {/* ── Hamburger (always on top) ── */}
-      <div className = "nav_background">
-        <button className="nav_hamburger" onClick={toggleMenu} aria-label="Toggle menu">
-          ☰
-        </button>
-      </div>
-
-      {/* ── Dropdown overlay ── */}
-      {menuVisible && (
-        <div
-          className={`dropdown-overlay ${closing ? "dropdown-overlay--closing" : ""}`}
-          onClick={closeMenu}
-        />
-      )}
-
-      {menuVisible && (
-        <div className={`dropdown ${closing ? "dropdown--closing" : ""}`}>
-          {NAV_ROUTES.map(({ label, path }) => (
-            <div key={label}>
-              <div
-                className={`dropdown_item ${label === "Menu" ? "dropdown_item--parent" : ""}`}
-                onClick={() => {
-                  if (label === "Menu") setMenuExpanded((prev) => !prev);
-                  else handleNav(path);
-                }}
-              >
-                {label}
-                {label === "Menu" && (
-                  <span className={`dropdown_arrow ${menuExpanded ? "dropdown_arrow--open" : ""}`}>
-                    ▼
-                  </span>
-                )}
-              </div>
-
-              {label === "Menu" && menuExpanded && (
-                <div className="dropdown_subnav">
-                  {MENU_SUBNAV.map((group) => (
-                    <div key={group.section}>
-                      <div className="dropdown_subgroup_label">{group.section}</div>
-                      {group.categories.map((cat) => (
-                        <div
-                          key={cat}
-                          className="dropdown_subitem"
-                          onClick={() => handleNav("/menu")}
-                        >
-                          {cat}
-                        </div>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-
+      <NavBar />
 
       {/* ── Hero banner ── */}
       <div className="menu-hero">
@@ -354,7 +252,7 @@ export default function MenuPage() {
         </span>
         <button className="btn-checkout" 
           disabled={cart.length === 0}
-          onClick={() => navigate("/checkout/cart")}
+          onClick={() => navigate("/checkout/cart", {state: {cart}})}
         >
           Checkout
           {cart.length > 0 && (

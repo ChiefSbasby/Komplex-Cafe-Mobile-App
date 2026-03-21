@@ -13,7 +13,7 @@
   width: 100%;
   max-width: 480px;
   margin: 0 auto;
-  margin-top: 70px;
+  padding-top: 62px;
   display: flex;
   flex-direction: column;
   padding-bottom: 80px;
