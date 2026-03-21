@@ -352,7 +352,10 @@ export default function MenuPage() {
         <span className="menu-footer-total">
           Total: <strong>{peso(cartTotal)}</strong>
         </span>
-        <button className="btn-checkout" disabled={cart.length === 0}>
+        <button className="btn-checkout" 
+          disabled={cart.length === 0}
+          onClick={() => navigate("/checkout/cart")}
+        >
           Checkout
           {cart.length > 0 && (
             <span className="cart-badge">{cart.length}</span>

@@ -4,7 +4,7 @@ import "../css/NavBar.css";
 
 const NAV_ITEMS = ["Home", "Menu", "About", "Contact"];
 
-export default function CheckoutPage() {
+export default function CheckoutPage_1() {
     /* ── Nav Bar ── */
     const [menuOpen, setMenuOpen] = useState(false);
     const [menuVisible, setMenuVisible] = useState(false);
