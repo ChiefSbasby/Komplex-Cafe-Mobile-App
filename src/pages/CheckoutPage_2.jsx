@@ -67,22 +67,35 @@ export default function CheckoutPage_2() {
             {/* not implemented yet: where data goes after form is filled */}
 
             <form className="checkout-extra">
-                <label className="order-type-label">Order Type</label>
-                    <button className="btn-dine-in">Dine In</button>
-                    <button className="btn-take-out">Take Out</button>
+                <section className="order-type">
+                        <h2 className="order-type-label">Order Type</h2>
+                        <button className="btn-dine-in">Dine In</button>
+                        <button className="btn-take-out">Take Out</button>
+                </section >
 
-                <label className="receive-at-label">Receive at</label>
-                    <button className="btn-counter">
-                        <strong>Counter</strong>
-                        <FaCashRegister />
-                    </button>
-                    <button className="btn-table">
-                        <strong>Table</strong>
-                        <MdOutlineTableRestaurant />
-                    </button>
+                <section className="receive-at">
+                    <label className="receive-at-label">
+                        <h2>Receive at</h2>
+                    </label>
+                        <button className="btn-counter">
+                            <strong>Counter</strong>
+                            <FaCashRegister />
+                        </button>
+                        <button className="btn-table">
+                            <strong>Table</strong>
+                            <MdOutlineTableRestaurant />
+                        </button>
+                </section>
 
-                <label className="special-instructions-label">Special Instructions</label>
-                <input type="text" name="special-instructions-input" />
+                <section className="spec-instruct">
+                    <label className="spec-instruct-label">
+                        <h2>Special Instructions</h2>
+                    </label>
+                    <textarea id="spec-instruct-text" name="spec-instruct-text" rows="7"
+                    defaultValue={<i>Example: no salt, no cutlery, etc.</i>}>
+                    </textarea> 
+                </section>
+
             </form>
 
             {/* ── Sticky footer ── */}

@@ -2,6 +2,9 @@
    CheckoutPage.css — Komplex Cafe
 ══════════════════════════════════════════════════════════════ */
 
+/* ─── Reset / base ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
 /* ─── Page shell ────────────────────────────────────────────── */
 .checkout-page {
     font-family: 'Golos', sans-serif;
@@ -97,15 +100,43 @@
     opacity: 0.5;
     cursor: not-allowed;
 }
+.order-type-label{
+    display: flex;
+}
+.order-type-label::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    background: #111;
+    border-radius: 2px;
+}
 
-@media (min-width:501px){
-    .checkout-page{
+.receive-at-label::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    background: #111;
+    border-radius: 2px;
+}
+
+.spec-instruct-label::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    background: #111;
+    border-radius: 2px;
+}
+
+@media (min-width:501px) {
+    .checkout-page {
         max-width: 100%;
     }
-    .checkout-footer{
+
+    .checkout-footer {
         max-width: 100%;
     }
-    .checkout-footer-buttons{
+
+    .checkout-footer-buttons {
         align-items: end;
         justify-content: end;
         gap: 50px
