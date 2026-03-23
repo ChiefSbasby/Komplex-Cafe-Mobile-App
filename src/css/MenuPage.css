@@ -19,7 +19,6 @@
   padding-bottom: 80px;
 }
 
-
 /* ─── Hero banner ───────────────────────────────────────────── */
 .menu-hero {
   font-family: 'gliker', sans-serif;
@@ -112,13 +111,9 @@
   text-align: left;
   transition: background 0.15s, transform 0.1s;
 }
-.menu-item:hover {
-  background: #e8e8e8;
-  transform: translateY(-1px);
-}
-.menu-item:active {
-  transform: scale(0.99);
-}
+.menu-item:hover  { background: #e8e8e8; transform: translateY(-1px); }
+.menu-item:active { transform: scale(0.99); }
+
 .menu-item-img {
   width: 72px;
   height: 72px;
@@ -138,12 +133,23 @@
   font-size: 14px;
   font-weight: 600;
   color: #111;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
 }
 .menu-item-price {
   font-size: 13px;
   font-weight: 700;
   color: #111;
   align-self: flex-end;
+}
+
+/* ─── Best-seller icon (menu card) ──────────────────────────── */
+.best-seller-icon {
+  font-size: 13px;
+  color: #e07820;
+  line-height: 1;
 }
 
 /* ─── Sticky footer ─────────────────────────────────────────── */
@@ -163,13 +169,9 @@
   z-index: 10;
   box-shadow: 0 -2px 8px rgba(0,0,0,.07);
 }
-.menu-footer-total {
-  font-size: 15px;
-  color: #111;
-}
-.menu-footer-total strong {
-  font-weight: 700;
-}
+.menu-footer-total { font-size: 15px; color: #111; }
+.menu-footer-total strong { font-weight: 700; }
+
 .btn-checkout {
   position: relative;
   background: #e07820;
@@ -182,11 +184,9 @@
   cursor: pointer;
   transition: background 0.15s, opacity 0.15s;
 }
-.btn-checkout:hover { background: #c96a18; }
-.btn-checkout:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+.btn-checkout:hover    { background: #c96a18; }
+.btn-checkout:disabled { opacity: 0.5; cursor: not-allowed; }
+
 .cart-badge {
   position: absolute;
   top: -6px;
@@ -207,7 +207,6 @@
    POPUP
 ══════════════════════════════════════════════════════════════ */
 
-/* ─── Overlay ───────────────────────────────────────────────── */
 .popup-overlay {
   position: fixed;
   inset: 0;
@@ -223,7 +222,6 @@
   to   { opacity: 1; }
 }
 
-/* ─── Popup card ────────────────────────────────────────────── */
 .popup {
   background: #fff;
   width: 100%;
@@ -247,11 +245,26 @@
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 12px;
+  gap: 12px;
+}
+.popup-header-left {
+  flex: 1;
+  min-width: 0;
 }
 .popup-name {
   font-size: 22px;
   font-weight: 800;
   color: #111;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+/* ─── Best-seller badge (popup) ─────────────────────────────── */
+.best-seller-badge {
+  font-size: 16px;
+  color: #e07820;
+  line-height: 1;
 }
 .popup-brand {
   font-size: 12px;
@@ -259,12 +272,24 @@
   display: block;
   margin-top: 2px;
 }
-.popup-base-price {
-  font-size: 18px;
+
+/* ─── Price display in header ───────────────────────────────── */
+.popup-prices {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.popup-price-tag {
+  font-size: 13px;
+  color: #555;
+  white-space: nowrap;
+}
+.popup-price-tag strong {
   font-weight: 700;
   color: #111;
-  white-space: nowrap;
-  margin-left: 12px;
+  font-size: 15px;
 }
 
 /* ─── Popup image ───────────────────────────────────────────── */
@@ -292,7 +317,7 @@
   color: #111;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
   margin-bottom: 8px;
 }
 .popup-section-label::after {
@@ -303,7 +328,7 @@
   border-radius: 2px;
 }
 
-/* ─── Serve type buttons ────────────────────────────────────── */
+/* ─── Serve type buttons (hot_iced) ────────────────────────── */
 .popup-serve-row {
   display: flex;
   gap: 10px;
@@ -321,16 +346,35 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 2px;
 }
 .serve-btn--active {
   background: #555;
   border-color: #555;
   color: #fff;
 }
-.serve-upcharge {
-  font-size: 10px;
-  font-weight: 400;
-  margin-top: 1px;
+.serve-price {
+  font-size: 11px;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+/* ─── Static serve label (hot_only / iced_only) ─────────────── */
+.serve-static {
+  display: inline-block;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: #f0f0f0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+}
+
+/* ─── Required star on dip tiers ───────────────────────────── */
+.dip-required {
+  color: #e07820;
+  font-size: 14px;
+  margin-left: 2px;
 }
 
 /* ─── Quantity row ──────────────────────────────────────────── */
@@ -362,13 +406,15 @@
   text-align: center;
 }
 
-/* ─── Add-ons ───────────────────────────────────────────────── */
-.popup-addons {
+/* ─── Add-ons & Dips shared row styles ─────────────────────── */
+.popup-addons,
+.popup-dips {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
-.addon-row {
+.addon-row,
+.dip-row {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -376,6 +422,13 @@
   padding: 2px 0;
 }
 .addon-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #e07820;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.dip-radio {
   width: 18px;
   height: 18px;
   accent-color: #e07820;
@@ -405,13 +458,9 @@
   border-top: 1px solid #eee;
   margin-top: 8px;
 }
-.popup-total-label {
-  font-size: 15px;
-  color: #111;
-}
-.popup-total-label strong {
-  font-weight: 700;
-}
+.popup-total-label { font-size: 15px; color: #111; }
+.popup-total-label strong { font-weight: 700; }
+
 .btn-add-item {
   background: #e07820;
   color: #fff;
@@ -421,20 +470,14 @@
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.15s, opacity 0.15s;
 }
-.btn-add-item:hover { background: #c96a18; }
+.btn-add-item:hover    { background: #c96a18; }
+.btn-add-item:disabled { opacity: 0.45; cursor: not-allowed; }
 
+/* ─── Responsive ─────────────────────────────────────────────── */
 @media (min-width: 501px) {
-  .menu-page {
-    max-width: 100%;
-  }
-
-  .menu-footer {
-    max-width: 100%;
-  }
-
-  .popup {
-    max-width: 480px;
-  }
+  .menu-page   { max-width: 100%; }
+  .menu-footer { max-width: 100%; }
+  .popup       { max-width: 480px; }
 }
