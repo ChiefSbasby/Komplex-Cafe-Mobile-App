@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { MENU, ADD_ONS, DIP_TIERS, CATEGORIES } from "../assets/data/menuData.js";
 import "../css/MenuPage.css";
 import NavBar from "../components/NavBar";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 /* ─── Placeholder image ────────────────────────────────────────── */
 const PLACEHOLDER =
@@ -266,7 +266,8 @@ function ItemPopup({ item, group, onClose, onAddToCart }) {
 export default function MenuPage() {
   const navigate = useNavigate();
 
-  const [activeCategory, setActiveCategory] = useState(null);
+  const [searchParams] = useSearchParams();
+  const [activeCategory, setActiveCategory] = useState(() => searchParams.get("category") || null);
   const [popup, setPopup]                   = useState(null);
   const [cart, setCart]                     = useState([]);
 
@@ -293,32 +294,35 @@ export default function MenuPage() {
     <div className="menu-page">
       <NavBar />
 
-      {/* ── Hero ── */}
-      <div className="menu-hero">
-        <h1 className="menu-hero-title">Menu</h1>
-      </div>
+      <section className="menu-header">
 
-      {/* ── Category chips ── */}
-      <div className="menu-chips-wrap">
-        <div className="menu-chips">
-          <button
-            className={`chip ${activeCategory === null ? "chip--active" : ""}`}
-            onClick={() => setActiveCategory(null)}
-          >
-            All
-          </button>
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              className={`chip ${activeCategory === cat ? "chip--active" : ""}`}
-              onClick={() => setActiveCategory((prev) => (prev === cat ? null : cat))}
-            >
-              {cat}
-            </button>
-          ))}
+        {/* ── Hero ── */}
+        <div className="menu-hero">
+          <h1 className="menu-hero-title">Menu</h1>
         </div>
-      </div>
 
+        {/* ── Category chips ── */}
+        <div className="menu-chips-wrap">
+          <div className="menu-chips">
+            <button
+              className={`chip ${activeCategory === null ? "chip--active" : ""}`}
+              onClick={() => setActiveCategory(null)}
+            >
+              All
+            </button>
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                className={`chip ${activeCategory === cat ? "chip--active" : ""}`}
+                onClick={() => setActiveCategory((prev) => (prev === cat ? null : cat))}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+
+      </section>
       {/* ── Menu list ── */}
       <div className="menu-list">
         {sections.map((section) => {

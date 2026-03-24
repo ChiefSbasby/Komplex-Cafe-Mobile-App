@@ -75,7 +75,7 @@ export default function NavBar() {
                         <div
                           key={cat}
                           className="dropdown_subitem"
-                          onClick={() => handleNav("/menu")}
+                          onClick={() => handleNav(`/menu?category=${encodeURIComponent(cat)}`)}
                         >
                           {cat}
                         </div>

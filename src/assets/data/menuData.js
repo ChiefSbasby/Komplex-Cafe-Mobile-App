@@ -140,7 +140,7 @@ export const MENU = [
 
   // ── RICE MEALS ──────────────────────────────────────────────────
   {
-    category: "Rice Meal",
+    category: "Rice Meals",
     section: "Meals",
     serveOptions: null,
     items: [

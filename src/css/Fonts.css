@@ -1,26 +1,9 @@
 @font-face {
   font-family: 'gliker';
-  src: url('../assets/Fonts/gliker-regular.ttf') format('truetype');
+  src: url('../assets/Fonts/gliker-regular.ttf') format('truetype'),
+        url('../assets/Fonts/gliker-regular.woff') format('woff'),
+        url('../assets/Fonts/gliker-regular.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
-}
-
-@font-face {
-  font-family: 'Golos';
-  src: url('../assets/Fonts/GolosText-VariableFont_wght.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'inter';
-  src: url('../assets/Fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-@font-face {
-  font-family: 'inter';
-  src: url('../assets/Fonts/Inter-Italic-VariableFont_opsz,wght.ttf') format('truetype');
-  font-weight: normal;
-  font-style: italic;
+  font-display: swap;
 }
