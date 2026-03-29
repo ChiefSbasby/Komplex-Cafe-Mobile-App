@@ -1,15 +1,9 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import "../css/CheckoutPage.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaTrash } from "react-icons/fa";
 import NavBar from "../components/NavBar";
 import EditItem from "../components/EditItem";
-
-const NAV_ROUTES = [
-    { label: "Home", path: "/" },
-    { label: "Menu", path: "/menu" },
-    { label: "Contact", path: "/contact" },
-];
 
 const peso = (n) =>
     "₱" + Number(n).toLocaleString("en-PH", { minimumFractionDigits: 2 });

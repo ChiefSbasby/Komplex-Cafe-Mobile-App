@@ -12,7 +12,7 @@ const PLACEHOLDER =
  
 /* ─── Resolve serve options for an individual item ─────────────── */
 const getServeOptions = (item, group) =>
-  item.serveOptions !== undefined ? item.serveOptions : group.serveOptions;
+  item.serveOptions !== undefined ? item.serveOptions : group?.serveOptions ?? null;
  
 /* ─── Get the starting serve mode for an item ──────────────────── */
 const defaultServe = (item, group) => {
@@ -91,6 +91,7 @@ export default function ItemPopup({ item, group, onClose, onAddToCart }) {
     if (!dipsValid) return;
     onAddToCart({
       item,
+      group,                      // ← was missing; needed by EditItem
       serve: serveMode ? serve : null,
       qty,
       addons: item.hasAddOns ? ADD_ONS.filter((a) => addons[a.id]) : [],

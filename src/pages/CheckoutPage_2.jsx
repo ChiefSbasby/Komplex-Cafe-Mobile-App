@@ -1,22 +1,12 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { FaCashRegister } from "react-icons/fa";
 import { MdOutlineTableRestaurant } from "react-icons/md";
 import "../css/CheckoutPage.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import NavBar from "../components/NavBar";
 
-const NAV_ROUTES = [
-    { label: "Home", path: "/" },
-    { label: "Menu", path: "/menu" },
-    { label: "Contact", path: "/contact" },
-];
-
 const peso = (n) =>
     "₱" + Number(n).toLocaleString("en-PH", { minimumFractionDigits: 2 });
-
-function orderForm() {
-    {/* stuf s supposd to go here idk wat */}
-}
 
 export default function CheckoutPage_2() {
     const location = useLocation();
@@ -24,6 +14,20 @@ export default function CheckoutPage_2() {
 
     const cart = location.state?.cart ?? [];
     const cartTotal = cart.reduce((s, e) => s + e.lineTotal, 0);
+
+    /* ── Form state ── */
+    const [orderType,    setOrderType]    = useState(null);      // "dine_in" | "take_out"
+    const [receiveAt,    setReceiveAt]    = useState(null);      // "counter" | "table"
+    const [instructions, setInstructions] = useState("");
+
+    const canContinue = orderType && receiveAt;
+
+    const handleCheckout = () => {
+        if (!canContinue) return;
+        navigate("/paymenttype", {
+            state: { cart, orderType, receiveAt, instructions },
+        });
+    };
 
     return (
         <div className="wrapper">
@@ -36,42 +40,65 @@ export default function CheckoutPage_2() {
                     <h1 className="checkout-hero-title">Checkout</h1>
                 </div>
 
-                <p>hi ur in the SECOND checkout page</p>
+                {/* ── Order Details form ── */}
+                <div className="checkout-extra">
 
-                {/* ── Order Details ── */}
-                {/* not implemented yet: where data goes after form is filled */}
-
-                <form className="checkout-extra">
+                    {/* Order Type */}
                     <section className="order-type">
-                            <h2 className="order-type-label">Order Type</h2>
-                            <button className="btn-dine-in">Dine In</button>
-                            <button className="btn-take-out">Take Out</button>
-                    </section >
-
-                    <section className="receive-at">
-                        <label className="receive-at-label">
-                            <h2>Receive at</h2>
-                        </label>
-                            <button className="btn-counter">
-                                <strong>Counter</strong>
-                                <FaCashRegister />
-                            </button>
-                            <button className="btn-table">
-                                <strong>Table</strong>
-                                <MdOutlineTableRestaurant />
-                            </button>
+                        <h2 className="order-type-label">Order Type</h2>
+                        <button
+                            type="button"
+                            className={`btn-dine-in${orderType === "dine_in" ? " btn--active" : ""}`}
+                            onClick={() => setOrderType("dine_in")}
+                        >
+                            Dine In
+                        </button>
+                        <button
+                            type="button"
+                            className={`btn-take-out${orderType === "take_out" ? " btn--active" : ""}`}
+                            onClick={() => setOrderType("take_out")}
+                        >
+                            Take Out
+                        </button>
                     </section>
 
+                    {/* Receive At */}
+                    <section className="receive-at">
+                        <h2 className="receive-at-label">Receive at</h2>
+                        <button
+                            type="button"
+                            className={`btn-counter${receiveAt === "counter" ? " btn--active" : ""}`}
+                            onClick={() => setReceiveAt("counter")}
+                        >
+                            <strong>Counter</strong>
+                            <FaCashRegister />
+                        </button>
+                        <button
+                            type="button"
+                            className={`btn-table${receiveAt === "table" ? " btn--active" : ""}`}
+                            onClick={() => setReceiveAt("table")}
+                        >
+                            <strong>Table</strong>
+                            <MdOutlineTableRestaurant />
+                        </button>
+                    </section>
+
+                    {/* Special Instructions */}
                     <section className="spec-instruct">
-                        <label className="spec-instruct-label">
+                        <label className="spec-instruct-label" htmlFor="spec-instruct-text">
                             <h2>Special Instructions</h2>
                         </label>
-                        <textarea id="spec-instruct-text" name="spec-instruct-text" rows="7"
-                        defaultValue={<i>Example: no salt, no cutlery, etc.</i>}>
-                        </textarea> 
+                        <textarea
+                            id="spec-instruct-text"
+                            name="spec-instruct-text"
+                            rows="7"
+                            placeholder="Example: no salt, no cutlery, etc."
+                            value={instructions}
+                            onChange={(e) => setInstructions(e.target.value)}
+                        />
                     </section>
 
-                </form>
+                </div>
 
                 {/* ── Sticky footer ── */}
                 <div className="checkout-footer">
@@ -79,11 +106,24 @@ export default function CheckoutPage_2() {
                         Total: <strong>{peso(cartTotal)}</strong>
                     </div>
                     <div className="checkout-footer-buttons">
-                        <button className="btn-back" onClick={() => navigate("/checkout/cart")}>Back</button>
-                        {/* checkout button is not implemented yet */}
-                        <button className="btn-checkout" onClick={() => navigate("/paymenttype")}>Checkout</button>
+                        <button
+                            type="button"
+                            className="btn-back"
+                            onClick={() => navigate("/checkout/cart", { state: { cart } })}
+                        >
+                            Back
+                        </button>
+                        <button
+                            type="button"
+                            className="btn-checkout"
+                            disabled={!canContinue}
+                            onClick={handleCheckout}
+                        >
+                            Checkout
+                        </button>
                     </div>
                 </div>
+
             </div>
         </div>
     );

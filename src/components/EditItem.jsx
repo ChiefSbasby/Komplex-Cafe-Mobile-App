@@ -13,7 +13,7 @@ const PLACEHOLDER =
 
 /* ─── Resolve serve options for an individual item ─────────────── */
 const getServeOptions = (item, group) =>
-  item.serveOptions !== undefined ? item.serveOptions : group.serveOptions;
+  item.serveOptions !== undefined ? item.serveOptions : group?.serveOptions ?? null;
 
 /* ─── Resolve display price for a cart-entry item ──────────────── */
 const resolveBasePrice = (item, serve) => {
@@ -33,7 +33,7 @@ const resolveBasePrice = (item, serve) => {
 ═══════════════════════════════════════════════════════════════════ */
 export default function EditItem({ entry, entryIndex, onClose, onSave }) {
   const { item, group } = entry;
-  const serveMode = getServeOptions(item, group);
+  const serveMode = getServeOptions(item, group ?? {});
 
   /* ── Pre-fill state from existing cart entry ── */
   const [serve, setServe] = useState(() => entry.serve ?? "hot");
@@ -142,7 +142,7 @@ export default function EditItem({ entry, entryIndex, onClose, onSave }) {
               {item.name}
               {item.bestSeller && <span className="best-seller-badge">♥</span>}
             </h2>
-            {group.brand && <span className="popup-brand">{group.brand}</span>}
+            {group?.brand && <span className="popup-brand">{group.brand}</span>}
           </div>
           <div className="popup-prices">
             {serveMode === "hot_iced" && (
