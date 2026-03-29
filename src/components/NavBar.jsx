@@ -8,6 +8,9 @@ const NAV_ROUTES = [
   { label: "Contact", path: "/contact" },
 ];
 
+const PLACEHOLDER =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='%23666769'/%3E%3C/svg%3E";
+
 const MENU_SUBNAV = [
   { section: "Drinks",    categories: ["Coffee", "Non-Coffee", "Frappes", "Fruit Teas"] },
   { section: "Meals",     categories: ["Pasta", "Rice Meals", "Snacks", "Sandwiches"] },
@@ -38,7 +41,14 @@ export default function NavBar() {
         <button className="nav_hamburger" onClick={toggleMenu} aria-label="Toggle menu">
           ☰
         </button>
+
+        <button className="nav_homeLogo" onClick={() => navigate("/")}>
+          <div className="nav_logo">
+            <img alt="Komplex Cafe" src={PLACEHOLDER}></img>
+          </div>
+        </button>
       </div>
+      
 
       {/* ── Backdrop ── */}
       {menuVisible && (

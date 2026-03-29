@@ -1,9 +1,10 @@
 
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import "../css/PaymentTypePage.css";
 import NavBar from "../components/NavBar";
 
 export default function PaymentType() {
+    const navigate = useNavigate();
     return(
         <div className="wrapper">
             < NavBar/>
@@ -22,7 +23,7 @@ export default function PaymentType() {
                             <img src="src\assets\cashcounter.png"></img>
                             <p className="btn-text">Cash at the Counter</p>
                         </button>
-                        <button id="online" value={1} onClick={()=>{}}> 
+                        <button id="online" value={1} onClick={()=> navigate("/qrpage")}> 
                             <img src="src\assets\onlinepayment.png"></img>
                             <p className="btn-text">Online Payment</p>
                         </button>

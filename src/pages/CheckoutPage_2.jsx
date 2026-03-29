@@ -81,7 +81,7 @@ export default function CheckoutPage_2() {
                     <div className="checkout-footer-buttons">
                         <button className="btn-back" onClick={() => navigate("/checkout/cart")}>Back</button>
                         {/* checkout button is not implemented yet */}
-                        <button className="btn-checkout" onClick={() => navigate("/checkout/cart")}>Checkout</button>
+                        <button className="btn-checkout" onClick={() => navigate("/paymenttype")}>Checkout</button>
                     </div>
                 </div>
             </div>

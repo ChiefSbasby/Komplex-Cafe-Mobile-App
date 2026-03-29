@@ -10,6 +10,9 @@
 
 .nav_background {
   position: fixed;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   top: 0;
   left: 50%;
   transform: translateX(-50%);
@@ -17,6 +20,20 @@
   /* max-width: 551px; */
   background-color: white;
   z-index: 998;
+}
+
+.nav_homeLogo{
+  line-height: 0;
+}
+
+.nav_logo{
+  margin: 10.5px 10px;
+}
+
+.nav_logo img{
+  width:55px;
+  height: 55px;
+  border-radius: 100px;
 }
 
 .nav_hamburger {
@@ -160,6 +177,13 @@
 @media (max-width: 500px){
   .nav_background{
     max-width: 100%;
+  }
+  .nav_logo{
+    margin: 5px 10px;
+  }
+  .nav_logo img{
+    width: 40px;
+    height: 40px;
   }
 }
 @media (min-width: 501px) {

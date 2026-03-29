@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { ADD_ONS, DIP_TIERS } from "../assets/data/menuData.js";
+import "../css/PopUp.css";
  
 /* ─── Currency formatter ───────────────────────────────────────── */
 const peso = (n) =>
