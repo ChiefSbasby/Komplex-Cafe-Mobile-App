@@ -11,11 +11,13 @@ export default function ConfirmationPage() {
     
                 <div className="confirmation-page">
                     <section className="confirmation-white">
-                     <h2 className="confirmation-header">Your order is being prepared!</h2>
-                     
-                     <p className="reference-number">REF NO. 12345</p>
-    
-                     <p className="confirmation-subtitle">Please save this reference number to claim your order</p>
+                    <div className="confirmation-border">
+                        <h2 className="confirmation-header">Your order is being prepared!</h2>
+                        
+                        <p className="reference-number">REF NO. 12345</p>
+        
+                        <p className="confirmation-subtitle">Please save this reference number to claim your order</p>
+                    </div>
                     </section>
                 </div>
             </div>
