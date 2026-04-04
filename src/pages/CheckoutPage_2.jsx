@@ -13,11 +13,11 @@ export default function CheckoutPage_2() {
     const navigate = useNavigate();
 
     const cart = location.state?.cart ?? [];
-    const cartTotal = cart.reduce((s, e) => s + e.lineTotal, 0);
+    const cartTotal = cart.reduce((s, e) => s + e.price * e.qty, 0);
 
     /* ── Form state ── */
-    const [orderType,    setOrderType]    = useState(null);      // "dine_in" | "take_out"
-    const [receiveAt,    setReceiveAt]    = useState(null);      // "counter" | "table"
+    const [orderType,    setOrderType]    = useState(null);  // "dine_in" | "take_out"
+    const [receiveAt,    setReceiveAt]    = useState(null);  // "counter" | "table"
     const [instructions, setInstructions] = useState("");
 
     const canContinue = orderType && receiveAt;
@@ -74,7 +74,7 @@ export default function CheckoutPage_2() {
                                 onClick={() => setReceiveAt("counter")}
                             >
                                 <strong>Counter</strong>
-                                <FaCashRegister size={30}/>
+                                <FaCashRegister size={30} />
                             </button>
                             <button
                                 type="button"
@@ -82,7 +82,7 @@ export default function CheckoutPage_2() {
                                 onClick={() => setReceiveAt("table")}
                             >
                                 <strong>Table</strong>
-                                <MdOutlineTableRestaurant size={40}/>
+                                <MdOutlineTableRestaurant size={40} />
                             </button>
                         </div>
                     </section>
@@ -93,7 +93,8 @@ export default function CheckoutPage_2() {
                             <h2>Special Instructions</h2>
                         </label>
                         <div className="spec-instruct-textarea">
-                            <textarea className="spec-instruct-text"
+                            <textarea
+                                className="spec-instruct-text"
                                 id="spec-instruct-text"
                                 name="spec-instruct-text"
                                 rows="8"

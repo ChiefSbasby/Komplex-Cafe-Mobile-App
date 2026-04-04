@@ -60,13 +60,17 @@ button img{
 
 @media (min-width: 500px){
     .paymenttype-buttonlayout{
-        grid-template-rows: 0;
+        grid-template-rows: auto;
         grid-template-columns: auto auto auto;
-        column-gap: 50px;
+        column-gap: 50px;  
+        justify-content: center;
     }
     .paymenttype-buttonlayout button{
         margin-top: 100px;
         width: 335px;
         height:300px;
+    }
+    .paymenttype-page{
+        max-width: 100%;
     }
 }
