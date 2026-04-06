@@ -98,8 +98,8 @@ export default function CheckoutPage_2() {
                                 id="spec-instruct-text"
                                 name="spec-instruct-text"
                                 rows="8"
-                                placeholder="Example: no salt, no cutlery, etc. (350 characters only)"
-                                maxLength={350}
+                                placeholder="Example: no salt, no cutlery, etc. (255 characters only)"
+                                maxLength={255}
                                 value={instructions}
                                 onChange={(e) => setInstructions(e.target.value)}
                             />

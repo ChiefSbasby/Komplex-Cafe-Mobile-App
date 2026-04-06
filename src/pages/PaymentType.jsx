@@ -10,13 +10,13 @@ import "../css/PaymentTypePage.css";
 import NavBar from "../components/NavBar";
 import UploadReceiptPopup from "../components/UploadReceiptPopup";
 
-/* ─── Session-based guest ID ─────────────────────────────────── */
+/* ─── Session-based guest ID ─────────────────────────────────────
+   Returns the existing guest_id for this session, or null if this
+   is a new guest — the counter will assign the real ID.
+──────────────────────────────────────────────────────────────── */
 const getSessionGuestId = () => {
   const existing = sessionStorage.getItem("guest_id");
-  if (existing) return Number(existing);
-  const newId = Date.now() * 1000 + Math.floor(Math.random() * 1000);
-  sessionStorage.setItem("guest_id", String(newId));
-  return newId;
+  return existing ? Number(existing) : null;
 };
 
 const generateReferenceNumber = (paymentId) => 100000 + paymentId;
@@ -36,27 +36,40 @@ export default function PaymentType() {
 
   /* ── Core Firestore write (shared by both payment types) ── */
   const submitOrder = async (paymentType, receiptUrl = "") => {
-    const guestId = getSessionGuestId();
+    const existingGuestId  = getSessionGuestId();
+    const isNewGuest       = existingGuestId === null;
 
     const orderCounterRef   = doc(db, "counters", "order_id");
     const paymentCounterRef = doc(db, "counters", "payment_id");
-    const guestRef          = doc(db, "tbl_guests", String(guestId));
+    const guestCounterRef   = doc(db, "counters", "guest_counter");
 
-    let newOrderId, newPaymentId;
+    let newOrderId, newPaymentId, guestId;
 
     await runTransaction(db, async (transaction) => {
-      const [orderSnap, paymentSnap, guestSnap] = await Promise.all([
+      /* 1. Read counters — include guest counter only for new guests */
+      const reads = [
         transaction.get(orderCounterRef),
         transaction.get(paymentCounterRef),
-        transaction.get(guestRef),
-      ]);
+        isNewGuest ? transaction.get(guestCounterRef) : Promise.resolve(null),
+      ];
 
+      const [orderSnap, paymentSnap, guestCounterSnap] = await Promise.all(reads);
+
+      /* 2. Calculate IDs */
       newOrderId   = (orderSnap.data()?.current_value   ?? 0) + 1;
       newPaymentId = (paymentSnap.data()?.current_value ?? 0) + 1;
+      guestId      = isNewGuest
+        ? (guestCounterSnap.data()?.current_value ?? 0) + 1
+        : existingGuestId;
 
+      /* 3. Update counters */
       transaction.update(orderCounterRef,   { current_value: newOrderId   });
       transaction.update(paymentCounterRef, { current_value: newPaymentId });
+      if (isNewGuest) {
+        transaction.update(guestCounterRef, { last_guest_id: guestId });
+      }
 
+      /* 4. Write tbl_orders */
       const orderRef = doc(db, "tbl_orders", String(newOrderId));
       transaction.set(orderRef, {
         order_id:      newOrderId,
@@ -77,7 +90,9 @@ export default function PaymentType() {
         o_timestamp:   serverTimestamp(),
       });
 
-      if (!guestSnap.exists()) {
+      /* 5. Write tbl_guests only for new guests */
+      if (isNewGuest) {
+        const guestRef = doc(db, "tbl_guests", String(guestId));
         transaction.set(guestRef, {
           guest_id:     guestId,
           order_id:     newOrderId,
@@ -85,6 +100,7 @@ export default function PaymentType() {
         });
       }
 
+      /* 6. Write tbl_payments */
       const paymentRef = doc(db, "tbl_payments", String(newPaymentId));
       transaction.set(paymentRef, {
         payment_id:       newPaymentId,
@@ -95,6 +111,11 @@ export default function PaymentType() {
         transaction_time: serverTimestamp(),
       });
     });
+
+    /* 7. Persist guest_id to session after successful transaction */
+    if (isNewGuest) {
+      sessionStorage.setItem("guest_id", String(guestId));
+    }
 
     return { newOrderId, newPaymentId };
   };
@@ -130,7 +151,7 @@ export default function PaymentType() {
       console.error("Failed to submit order:", err);
       setError("Something went wrong. Please try again.");
       setSubmitting(false);
-      throw err; // re-throw so the popup can show its own error state
+      throw err;
     }
   };
 
