@@ -84,7 +84,7 @@ export default function PaymentType() {
         order_status:  paymentType === 1 ? "PROCESSING PAYMENT" : "PENDING",
         order_type:    orderType    ?? null,
         receive_at:    receiveAt    ?? null,
-        instructions:  instructions || null,
+        special_instructions:  instructions || null,
         table_id:      null,
         receipt_image: receiptUrl,
         o_timestamp:   serverTimestamp(),
