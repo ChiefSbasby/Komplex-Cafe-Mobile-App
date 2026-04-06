@@ -117,3 +117,14 @@
   transition: background 0.15s;
 }
 .upload-btn-back:hover { background: #d5d5d5; }
+
+/* ── Append to your existing UploadReceiptPopup.css ── */
+ 
+.upload-error {
+  font-size: 13px;
+  color: #d0382b;
+  text-align: center;
+  margin: 4px 0 0;
+  padding: 0 4px;
+}
+ 

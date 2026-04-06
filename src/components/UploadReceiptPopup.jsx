@@ -1,4 +1,6 @@
 import { useRef, useState, useEffect } from "react";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "../firebase.js";
 import "../css/PopUp.css";
 import "../css/UploadReceiptPopup.css";
 
@@ -8,31 +10,37 @@ const PLACEHOLDER_IMG =
 /* ═══════════════════════════════════════════════════════════════════
    UPLOAD RECEIPT POPUP
    Props:
-     onClose  — () => void
-     onSubmit — (file: File) => void
+     onClose   — () => void
+     onSubmit  — (receiptUrl: string) => Promise<void>
+                 Called with the Firebase Storage download URL.
+                 The parent is responsible for writing the order.
 ═══════════════════════════════════════════════════════════════════ */
 export default function UploadReceiptPopup({ onClose, onSubmit }) {
-  const [preview, setPreview] = useState(null);
-  const [file, setFile]       = useState(null);
+  const [preview,  setPreview]  = useState(null);
+  const [file,     setFile]     = useState(null);
   const [dragging, setDragging] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [error,    setError]    = useState(null);
+
   const fileInputRef = useRef();
   const overlayRef   = useRef();
 
   /* lock body scroll */
   useEffect(() => {
     document.body.style.overflow = "hidden";
-    return () => (document.body.style.overflow = "");
+    return () => { document.body.style.overflow = ""; };
   }, []);
 
   /* click outside to close */
   const handleOverlayClick = (e) => {
-    if (e.target === overlayRef.current) onClose();
+    if (!uploading && e.target === overlayRef.current) onClose();
   };
 
   const loadFile = (f) => {
     if (!f || !f.type.startsWith("image/")) return;
     setFile(f);
     setPreview(URL.createObjectURL(f));
+    setError(null);
   };
 
   const handleFileChange = (e) => loadFile(e.target.files[0]);
@@ -43,20 +51,38 @@ export default function UploadReceiptPopup({ onClose, onSubmit }) {
     loadFile(e.dataTransfer.files[0]);
   };
 
-  const handleSubmit = () => {
-    if (!file) return;
-    onSubmit?.(file);
-    onClose();
+  /* ── Upload to Firebase Storage, then hand URL to parent ── */
+  const handleSubmit = async () => {
+    if (!file || uploading) return;
+    setUploading(true);
+    setError(null);
+
+    try {
+      const ext        = file.name.split(".").pop();
+      const storageRef = ref(storage, `receipt_image/${Date.now()}.${ext}`);
+      await uploadBytes(storageRef, file);
+      const receiptUrl = await getDownloadURL(storageRef);
+
+      await onSubmit(receiptUrl); // parent writes order & navigates
+    } catch (err) {
+      console.error("Receipt upload failed:", err);
+      setError("Upload failed. Please try again.");
+      setUploading(false);
+    }
   };
 
   return (
-    <div className="popup-overlay upload-overlay" ref={overlayRef} onClick={handleOverlayClick}>
+    <div
+      className="popup-overlay upload-overlay"
+      ref={overlayRef}
+      onClick={handleOverlayClick}
+    >
       <div className="popup upload-popup">
 
         {/* ── Drop zone ── */}
         <div
-          className={`upload-dropzone ${dragging ? "upload-dropzone--drag" : ""} ${preview ? "upload-dropzone--has-preview" : ""}`}
-          onClick={() => fileInputRef.current.click()}
+          className={`upload-dropzone${dragging ? " upload-dropzone--drag" : ""}${preview ? " upload-dropzone--has-preview" : ""}`}
+          onClick={() => !uploading && fileInputRef.current.click()}
           onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
           onDragLeave={() => setDragging(false)}
           onDrop={handleDrop}
@@ -79,16 +105,22 @@ export default function UploadReceiptPopup({ onClose, onSubmit }) {
           onChange={handleFileChange}
         />
 
+        {error && <p className="upload-error">{error}</p>}
+
         {/* ── Buttons ── */}
         <div className="upload-footer">
           <button
             className="upload-btn-submit"
             onClick={handleSubmit}
-            disabled={!file}
+            disabled={!file || uploading}
           >
-            Submit Receipt
+            {uploading ? "Uploading…" : "Submit Receipt"}
           </button>
-          <button className="upload-btn-back" onClick={onClose}>
+          <button
+            className="upload-btn-back"
+            onClick={onClose}
+            disabled={uploading}
+          >
             Back
           </button>
         </div>
