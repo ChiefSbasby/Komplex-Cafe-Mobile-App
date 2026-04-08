@@ -40,15 +40,15 @@ const ContactUs = () => {
                 
                 <div className="contacts_socmed">
                     <h3 className="contacts_socmed_text">Social Media</h3>
-                    <a href="https://web.facebook.com/profile.php?id=61563281091251" target="_blank" rel="noreferrer noopener"><p className="socmed_fb_text contacts_links"><FaFacebook /> Komplex Cafe</p></a>
-                    <a href="https://www.instagram.com/komplex.cafe/" target="_blank" rel="noreferrer noopener"><p className="socmed_ig_text contacts_links"><FaInstagram /> @komplex.cafe</p></a>
-                    <a href="https://www.tiktok.com/@komplex.cafe" target="_blank" rel="noreferrer noopener"><p className="socmed_ig_text contacts_links"><FaTiktok /> Komplex Cafe</p></a>
+                    <p className="socmed_fb_text contacts_links"><a href="https://web.facebook.com/profile.php?id=61563281091251" target="_blank" rel="noreferrer noopener"><FaFacebook /> Komplex Cafe</a></p>
+                    <p className="socmed_ig_text contacts_links"><a href="https://www.instagram.com/komplex.cafe/" target="_blank" rel="noreferrer noopener"><FaInstagram /> @komplex.cafe</a></p>
+                    <p className="socmed_ig_text contacts_links"><a href="https://www.tiktok.com/@komplex.cafe" target="_blank" rel="noreferrer noopener"><FaTiktok /> Komplex Cafe</a></p>
                 </div>
 
                 <div className="contacts_other">
                     <h3 className="other_text">Komplex Studios</h3>
-                    <a href="https://web.facebook.com/profile.php?id=61579206300756" target="_blank" rel="noreferrer noopener"><p className="other_socmed_fb_text contacts_links"><FaFacebook /> Komplex Studios</p></a>
-                    <a href="https://www.instagram.com/komplex.studios/" target="_blank" rel="noreferrer noopener"><p className="other_socmed_ig_text contacts_links"><FaInstagram /> @komplex.studios</p></a>
+                    <p className="other_socmed_fb_text contacts_links"><a href="https://web.facebook.com/profile.php?id=61579206300756" target="_blank" rel="noreferrer noopener"><FaFacebook /> Komplex Studios</a></p>
+                    <p className="other_socmed_ig_text contacts_links"><a href="https://www.instagram.com/komplex.studios/" target="_blank" rel="noreferrer noopener"><FaInstagram /> @komplex.studios</a></p>
                 </div>
 
             </section>
