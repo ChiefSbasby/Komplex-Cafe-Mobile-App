@@ -1,6 +1,7 @@
 import { MdOutlineMail } from "react-icons/md";
 import { FaFacebook } from "react-icons/fa";
 import { FaInstagram } from "react-icons/fa";
+import { FaTiktok } from "react-icons/fa6";
 import "../css/ContactUs.css";
 import NavBar from "../components/NavBar";
 
@@ -34,19 +35,20 @@ const ContactUs = () => {
                 {/* List of Contacts */}
                 <div className="contacts_email">
                     <h3 className="contacts_email_text">Email</h3>
-                    <p className="email_text"><MdOutlineMail /> komplexcafe@gmail.com</p>
+                    <p className="email_text contacts_links"><MdOutlineMail /> komplexcafe@gmail.com</p>
                 </div>
                 
                 <div className="contacts_socmed">
                     <h3 className="contacts_socmed_text">Social Media</h3>
-                    <p className="socmed_fb_text"><FaFacebook /> Komplex Cafe</p>
-                    <p className="socmed_ig_text"><FaInstagram /> @komplex.cafe</p>
+                    <a href="https://web.facebook.com/profile.php?id=61563281091251" target="_blank" rel="noreferrer noopener"><p className="socmed_fb_text contacts_links"><FaFacebook /> Komplex Cafe</p></a>
+                    <a href="https://www.instagram.com/komplex.cafe/" target="_blank" rel="noreferrer noopener"><p className="socmed_ig_text contacts_links"><FaInstagram /> @komplex.cafe</p></a>
+                    <a href="https://www.tiktok.com/@komplex.cafe" target="_blank" rel="noreferrer noopener"><p className="socmed_ig_text contacts_links"><FaTiktok /> Komplex Cafe</p></a>
                 </div>
 
                 <div className="contacts_other">
                     <h3 className="other_text">Komplex Studios</h3>
-                    <p className="other_socmed_fb_text"><FaFacebook /> Komplex Studios</p>
-                    <p className="other_socmed_ig_text"><FaInstagram /> @komplex.studios</p>
+                    <a href="https://web.facebook.com/profile.php?id=61579206300756" target="_blank" rel="noreferrer noopener"><p className="other_socmed_fb_text contacts_links"><FaFacebook /> Komplex Studios</p></a>
+                    <a href="https://www.instagram.com/komplex.studios/" target="_blank" rel="noreferrer noopener"><p className="other_socmed_ig_text contacts_links"><FaInstagram /> @komplex.studios</p></a>
                 </div>
 
             </section>
