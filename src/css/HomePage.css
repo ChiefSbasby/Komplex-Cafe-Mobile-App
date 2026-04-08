@@ -260,6 +260,7 @@
 }
 
 @media (max-width: 500px) {
+  
   .hero_title{
     font-size: 35px !important;
   }
@@ -296,4 +297,49 @@
     margin: 0;
     line-height: 1.5;
   }
+}
+
+@media(min-width: 501px){
+  .wrapper{
+    max-width: 1000px
+  }
+
+  .hero {
+    scale: 1.05;
+  }
+
+  .intro{
+    padding: 10% 5%;
+  }
+
+  .intro_body{
+    font-size: 1.25em;
+  }
+
+  .about_img-wrap, .booking_img-wrap {
+    width: 200px !important;
+    height: 200px !important;
+    scale: 1.5;
+  }
+
+  .about{
+    padding: 7% 4% 7% 7%;
+  }
+
+  .about_text{
+    padding: 5% 5% 5% 15%;
+    font-size: 1.35em;
+    line-height: 1.7;
+  }
+
+  .hours{
+    padding: 6% 4% 6% 6%;
+    align-items: center;
+  }
+
+  .hours_content{
+    scale: 1.2;
+    justify-content: center;
+  }
+  
 }

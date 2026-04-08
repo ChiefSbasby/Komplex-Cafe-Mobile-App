@@ -6,7 +6,7 @@
   /* OPTIONAL: remove forced dark theme so your dashboard looks correct */
   color-scheme: light;
   color: #111;
-  background-color: lightgray;
+  background-color: rgb(40, 28, 22);
   background-attachment: scroll;
 
   font-synthesis: none;
