@@ -81,7 +81,8 @@
   padding: 0 16px 16px;
 }
 .menu-section {
-  margin-top: 160px;
+  margin-top: 150px;
+  scroll-margin-top: 220px;
 }
 .menu-section-title {
   font-size: 22px;

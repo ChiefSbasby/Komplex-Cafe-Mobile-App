@@ -1,126 +1,114 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import { db } from "../firebase.js";
 import "../css/CheckoutPage.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaTrash } from "react-icons/fa";
 import NavBar from "../components/NavBar";
+import EditItem from "../components/EditItem";
 
 const peso = (n) =>
-    "₱" + Number(n).toLocaleString("en-PH", { minimumFractionDigits: 2 });
+  "₱" + Number(n).toLocaleString("en-PH", { minimumFractionDigits: 2 });
 
 export default function CheckoutPage_1() {
-    const location = useLocation();
-    const navigate = useNavigate();
+  const location = useLocation();
+  const navigate = useNavigate();
 
-    /* ── Cart state (mutable inside this page) ── */
-    const [cart, setCart] = useState(
-        /* Ensure every entry has a valid qty — guards against stale state */
-        (location.state?.cart ?? []).map((e) => ({ ...e, qty: e.qty ?? 1 }))
-    );
+  const [cart, setCart] = useState(
+    (location.state?.cart ?? []).map((e) => ({ ...e, qty: e.qty ?? 1 }))
+  );
+  const [editTarget, setEditTarget] = useState(null);
+  const [addons, setAddons] = useState([]);
+  const [dips, setDips]     = useState([]);
 
-    const cartTotal = cart.reduce((s, e) => s + e.price * e.qty, 0);
-
-    /* ── Remove an item from cart ── */
-    const handleRemove = (index) => {
-        setCart((prev) => prev.filter((_, i) => i !== index));
+  useEffect(() => {
+    const fetch = async () => {
+      const q = query(collection(db, "tbl_menuItems"), orderBy("item_id", "asc"));
+      const snap = await getDocs(q);
+      const all = snap.docs.map((doc) => ({ ...doc.data(), docId: doc.id }));
+      setAddons(all.filter((i) => i.category === "Add-on"));
+      setDips(all.filter((i) => i.category === "Dip"));
     };
+    fetch();
+  }, []);
 
-    /* ── Adjust quantity; removes row if qty reaches 0 ── */
-    const handleQtyChange = (index, delta) => {
-        setCart((prev) =>
-            prev
-                .map((entry, i) => {
-                    if (i !== index) return entry;
-                    return { ...entry, qty: entry.qty + delta };
-                })
-                .filter((entry) => entry.qty > 0)
-        );
-    };
+  const cartTotal = cart.reduce((s, e) => s + e.lineTotal, 0);
 
-    return (
-        <div className="wrapper">
-            <div className="checkout-page">
+  const handleRemove = (index) =>
+    setCart((prev) => prev.filter((_, i) => i !== index));
 
-                <NavBar />
+  const handleSaveEdit = (updatedEntry, index) =>
+    setCart((prev) => prev.map((e, i) => (i === index ? updatedEntry : e)));
 
-                {/* ── Hero banner ── */}
-                <div className="checkout-hero">
-                    <h1 className="checkout-hero-title">Checkout</h1>
-                </div>
+  return (
+    <div className="wrapper">
+      <div className="checkout-page">
+        <NavBar />
 
-                {/* ── Cart items ── */}
-                <div className="checkout-list">
-                    {cart.length === 0 && (
-                        <p className="checkout-empty">Your cart is empty.</p>
-                    )}
-
-                    {cart.map((entry, index) => (
-                        <div key={entry.item_id} className="checkout-item">
-                            {/* Name + line total */}
-                            <div className="checkout-item-top">
-                                <span className="checkout-item-name">{entry.m_name}</span>
-                                <span className="checkout-item-price">
-                                    {peso(entry.price * entry.qty)}
-                                </span>
-                            </div>
-
-                            {/* Unit price */}
-                            <p className="checkout-item-sub">{peso(entry.price)} each</p>
-
-                            {/* Controls */}
-                            <div className="checkout-item-controls">
-                                <button
-                                    className="btn-remove-item"
-                                    onClick={() => handleRemove(index)}
-                                >
-                                    <FaTrash /> Remove
-                                </button>
-
-                                {/* Qty stepper */}
-                                <div className="item-qty-stepper">
-                                    <button
-                                        className="item-qty-btn"
-                                        onClick={() => handleQtyChange(index, -1)}
-                                    >
-                                        −
-                                    </button>
-                                    <span className="item-qty-display">{entry.qty}</span>
-                                    <button
-                                        className="item-qty-btn"
-                                        onClick={() => handleQtyChange(index, +1)}
-                                    >
-                                        +
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                {/* ── Sticky footer ── */}
-                <div className="checkout-footer">
-                    <div className="checkout-footer-total">
-                        Total: <strong>{peso(cartTotal)}</strong>
-                    </div>
-                    <div className="checkout-footer-buttons">
-                        <button
-                            className="btn-back"
-                            onClick={() => navigate("/menu", { state: { cart } })}
-                        >
-                            Back
-                        </button>
-                        <button
-                            className="btn-continue"
-                            disabled={cart.length === 0}
-                            onClick={() =>
-                                navigate("/checkout/extra", { state: { cart } })
-                            }
-                        >
-                            Continue
-                        </button>
-                    </div>
-                </div>
-
-            </div>
+        <div className="checkout-hero">
+          <h1 className="checkout-hero-title">Checkout</h1>
         </div>
-    );
+
+        <div className="checkout-list">
+          {cart.length === 0 && (
+            <p className="checkout-empty">Your cart is empty.</p>
+          )}
+          {cart.map((entry, index) => (
+            <div key={index} className="checkout-item">
+              <div className="checkout-item-top">
+                <span className="checkout-item-name">{entry.item.m_name}</span>
+                <span className="checkout-item-price">{peso(entry.lineTotal)}</span>
+              </div>
+              <p className="checkout-item-sub">
+                {peso(entry.item.price)} each × {entry.qty}
+                {entry.addons?.length > 0 && (
+                  <> · {entry.addons.map((a) => a.m_name).join(", ")}</>
+                )}
+                {entry.dips?.length > 0 && (
+                  <> · {entry.dips.map((d) => d.m_name).join(", ")}</>
+                )}
+              </p>
+              <div className="checkout-item-controls">
+                <button className="btn-remove-item" onClick={() => handleRemove(index)}>
+                  <FaTrash /> Remove
+                </button>
+                <button className="btn-edit-item" onClick={() => setEditTarget({ entry, index })}>
+                  Edit
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="checkout-footer">
+          <div className="checkout-footer-total">
+            Total: <strong>{peso(cartTotal)}</strong>
+          </div>
+          <div className="checkout-footer-buttons">
+            <button className="btn-back" onClick={() => navigate("/menu", { state: { cart } })}>
+              Back
+            </button>
+            <button
+              className="btn-continue"
+              disabled={cart.length === 0}
+              onClick={() => navigate("/checkout/extra", { state: { cart } })}
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {editTarget && (
+        <EditItem
+          entry={editTarget.entry}
+          entryIndex={editTarget.index}
+          addons={addons}
+          dips={dips}
+          onClose={() => setEditTarget(null)}
+          onSave={handleSaveEdit}
+        />
+      )}
+    </div>
+  );
 }

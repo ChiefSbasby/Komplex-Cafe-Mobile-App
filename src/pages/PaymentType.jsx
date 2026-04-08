@@ -20,6 +20,11 @@ const getSessionGuestId = () => {
   return existing ? Number(existing) : null;
 };
 
+const clean = (obj) =>
+  Object.fromEntries(
+    Object.entries(obj).filter(([, v]) => v !== undefined)
+  );
+
 const generateReferenceNumber = (paymentId) => 100000 + paymentId;
 
 export default function PaymentType() {
@@ -33,7 +38,7 @@ export default function PaymentType() {
   const [error, setError]                       = useState(null);
   const [showReceiptPopup, setShowReceiptPopup] = useState(false);
 
-  const totalAmount = cart.reduce((s, e) => s + e.price * e.qty, 0);
+  const totalAmount = cart.reduce((s, e) => s + e.lineTotal, 0);
 
   /* ── Core Firestore write (shared by both payment types) ── */
   const submitOrder = async (paymentType, receiptUrl = "") => {
@@ -72,14 +77,14 @@ export default function PaymentType() {
 
       /* 4. Write tbl_orders */
       const orderRef = doc(db, "tbl_orders", String(newOrderId));
-      transaction.set(orderRef, {
+      transaction.set(orderRef, clean({
         order_id:      newOrderId,
         guest_id:      guestId,
         user_id:       null,
         items:         cart.map((e) => ({
-          name:  e.m_name,
-          price: e.price,
-          qty:   e.qty,
+          name:    e.item?.m_name  ?? e.m_name  ?? "Unknown",
+          price:   e.item?.price   ?? e.price   ?? 0,
+          qty:     e.qty           ?? 1,
         })),
         total_amount:  totalAmount,
         order_status:  paymentType === 1 ? "PROCESSING PAYMENT" : "PENDING",
@@ -89,7 +94,7 @@ export default function PaymentType() {
         table_id:      null,
         receipt_image: receiptUrl,
         o_timestamp:   serverTimestamp(),
-      });
+      }));
 
       /* 5. Write or update tbl_guests
             New guest  → create doc with order_ids as a 1-item array

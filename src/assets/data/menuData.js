@@ -12,6 +12,36 @@
 // Hot/iced variants are split into separate items.
 // No add-ons or dips.
 
+export const ADD_ONS = [
+  { id: "espresso_shot",   label: "Espresso Shot",   price: 45 },
+  { id: "full_cream_milk", label: "Full Cream Milk", price: 20 },
+  { id: "syrup",           label: "Syrup",           price: 45 },
+  { id: "sauce",           label: "Sauce",           price: 20 },
+  { id: "sea_salt_cream",  label: "Sea Salt Cream",  price: 40 },
+];
+
+export const DIP_TIERS = [
+  {
+id: "dip_base",
+label: "Dip",
+required: true,          // must pick one
+options: [
+      { id: "choco",    label: "Choco",    price: 0 },
+      { id: "caramel",  label: "Caramel",  price: 0 },
+    ],
+  },
+  {
+id: "dip_topping",
+label: "Topping (optional)",
+required: false,          // optional tier
+options: [
+      { id: "none",           label: "None",           price: 0  },
+      { id: "whip_cream",     label: "Whip Cream",     price: 15 },
+      { id: "sea_salt_cream", label: "Sea Salt Cream", price: 15 },
+    ],
+  },
+];
+
 export const MENU = [
 
   // ── COFFEE ──────────────────────────────────────────────────────

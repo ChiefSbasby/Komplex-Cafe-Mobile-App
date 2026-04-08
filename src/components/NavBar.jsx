@@ -11,9 +11,9 @@ const NAV_ROUTES = [
 const PLACEHOLDER =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='%23666769'/%3E%3C/svg%3E";
 
-const MENU_SUBNAV = [
-  { section: "Drink", categories: ["Drink"] },
-  { section: "Food",  categories: ["Food"] },
+  const MENU_SUBNAV = [
+  { label: "Drink", category: "Drink" },
+  { label: "Food",  category: "Food"  },
 ];
 
 export default function NavBar() {
@@ -79,20 +79,16 @@ export default function NavBar() {
                 )}
               </div>
 
+              
               {label === "Menu" && menuExpanded && (
                 <div className="dropdown_subnav">
                   {MENU_SUBNAV.map((group) => (
-                    <div key={group.section}>
-                      <div className="dropdown_subgroup_label">{group.section}</div>
-                      {group.categories.map((cat) => (
-                        <div
-                          key={cat}
-                          className="dropdown_subitem"
-                          onClick={() => handleNav(`/menu?category=${encodeURIComponent(cat)}`)}
-                        >
-                          {cat}
-                        </div>
-                      ))}
+                    <div
+                      key={group.category}
+                      className="dropdown_subitem"
+                      onClick={() => handleNav(`/menu?category=${encodeURIComponent(group.category)}`)}
+                    >
+                      {group.label}
                     </div>
                   ))}
                 </div>

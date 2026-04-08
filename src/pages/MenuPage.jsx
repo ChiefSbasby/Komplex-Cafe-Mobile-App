@@ -1,48 +1,43 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { db } from "../firebase.js";
-import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import NavBar from "../components/NavBar";
+import ItemPopup from "../components/ItemPopUp";
 import "../css/MenuPage.css";
 
-/* ─── Placeholder image ────────────────────────────────────────── */
 const PLACEHOLDER =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='%23d1d5db'/%3E%3C/svg%3E";
 
-/* ─── Currency formatter ───────────────────────────────────────── */
 const peso = (n) =>
   "₱" + Number(n).toLocaleString("en-PH", { minimumFractionDigits: 2 });
 
-/* ═══════════════════════════════════════════════════════════════════
-   MENU PAGE
-═══════════════════════════════════════════════════════════════════ */
+const HIDDEN_CATEGORIES = ["Add-on", "Dip"];
+
 export default function MenuPage() {
   const navigate = useNavigate();
-  const location = useLocation();
-
   const [searchParams] = useSearchParams();
-  const [activeCategory, setActiveCategory] = useState(
-    () => searchParams.get("category") || null
-  );
-  const [cart, setCart] = useState(location.state?.cart ?? []);
+  const [popup, setPopup]   = useState(null);
+  const [cart, setCart]     = useState([]);
   const [menu, setMenu]     = useState([]);
+  const [addons, setAddons] = useState([]);
+  const [dips, setDips]     = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError]   = useState(null);
+  const [error, setError]     = useState(null);
 
-  /* ── Fetch menu from Firestore on mount ── */
+  const sectionRefs = useRef({});
+  const headerRef   = useRef();
+
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        const q = query(
-          collection(db, "tbl_menuItems"),
-          orderBy("item_id", "asc")
-        );
+        const q = query(collection(db, "tbl_menuItems"), orderBy("item_id", "asc"));
         const snapshot = await getDocs(q);
-        const items = snapshot.docs.map((doc) => ({
-          ...doc.data(),
-          docId: doc.id,           // keep Firestore doc ID in case it's needed
-        }));
-        setMenu(items);
+        const all = snapshot.docs.map((doc) => ({ ...doc.data(), docId: doc.id }));
+
+        setAddons(all.filter((i) => i.category === "Add-on"));
+        setDips(all.filter((i) => i.category === "Dip"));
+        setMenu(all.filter((i) => !HIDDEN_CATEGORIES.includes(i.category)));
       } catch (err) {
         console.error("Failed to fetch menu:", err);
         setError("Could not load the menu. Please try again.");
@@ -50,89 +45,76 @@ export default function MenuPage() {
         setLoading(false);
       }
     };
-
     fetchMenu();
   }, []);
 
-  /* ── Derived display data ── */
-  const categories = [...new Set(menu.map((item) => item.category))];
+  // Scroll to category from URL param once menu loads
+  useEffect(() => {
+    const cat = searchParams.get("category");
+    if (cat && sectionRefs.current[cat]) {
+      sectionRefs.current[cat].scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [menu]);
 
-  const visibleItems = activeCategory
-    ? menu.filter((item) => item.category === activeCategory)
-    : menu;
+  const categories = [...new Set(menu.map((i) => i.category))];
+  const groupedItems = categories.map((cat) => ({
+    category: cat,
+    items: menu.filter((i) => i.category === cat),
+  }));
 
-  const groupedItems = categories
-    .map((cat) => ({
-      category: cat,
-      items: visibleItems.filter((item) => item.category === cat),
-    }))
-    .filter((g) => g.items.length > 0);
+  const cartTotal = cart.reduce((s, e) => s + e.lineTotal, 0);
+  const cartCount = cart.reduce((s, e) => s + e.qty, 0);
 
-  const cartTotal = cart.reduce((sum, e) => sum + e.price * e.qty, 0);
-  const cartCount = cart.reduce((sum, e) => sum + e.qty, 0);
-
-  /* ── Add to cart — stack same item, otherwise push qty:1 ── */
-  const handleAddToCart = (item) => {
+  const handleAddToCart = (entry) => {
     setCart((prev) => {
-      const existing = prev.findIndex((e) => e.item_id === item.item_id);
+      const key = JSON.stringify({
+        docId:  entry.item.docId,
+        addons: entry.addons.map((a) => a.docId),
+        dips:   entry.dips.map((d) => d.docId),
+      });
+      const existing = prev.findIndex((e) => e._key === key);
       if (existing !== -1) {
         return prev.map((e, i) =>
-          i === existing ? { ...e, qty: e.qty + 1 } : e
+          i === existing
+            ? { ...e, qty: e.qty + entry.qty, lineTotal: e.lineTotal + entry.lineTotal }
+            : e
         );
       }
-      return [...prev, { ...item, qty: 1 }];
+      return [...prev, { ...entry, _key: key }];
     });
+    setPopup(null);
   };
 
-  /* ── Loading / error states ── */
-  if (loading) {
-    return (
-      <div className="wrapper">
-        <div className="menu-page">
-          <NavBar />
-          <div className="menu-loading">Loading menu…</div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="wrapper">
-        <div className="menu-page">
-          <NavBar />
-          <div className="menu-error">{error}</div>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return (
+    <div className="wrapper"><div className="menu-page"><NavBar /><div className="menu-loading">Loading menu…</div></div></div>
+  );
+  if (error) return (
+    <div className="wrapper"><div className="menu-page"><NavBar /><div className="menu-error">{error}</div></div></div>
+  );
 
   return (
     <div className="wrapper">
       <div className="menu-page">
         <NavBar />
 
-        <section className="menu-header">
-          {/* ── Hero ── */}
+        <section className="menu-header" ref={headerRef}>
           <div className="menu-hero">
             <h1 className="menu-hero-title">Menu</h1>
           </div>
-
-          {/* ── Category chips ── */}
           <div className="menu-chips-wrap">
             <div className="menu-chips">
               <button
-                className={`chip ${activeCategory === null ? "chip--active" : ""}`}
-                onClick={() => setActiveCategory(null)}
+                className="chip"
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
               >
                 All
               </button>
               {categories.map((cat) => (
                 <button
                   key={cat}
-                  className={`chip ${activeCategory === cat ? "chip--active" : ""}`}
+                  className="chip"
                   onClick={() =>
-                    setActiveCategory((prev) => (prev === cat ? null : cat))
+                    sectionRefs.current[cat]?.scrollIntoView({ behavior: "smooth", block: "start" })
                   }
                 >
                   {cat}
@@ -142,21 +124,24 @@ export default function MenuPage() {
           </div>
         </section>
 
-        {/* ── Menu list ── */}
         <div className="menu-list">
           {groupedItems.map(({ category, items }) => (
-            <div key={category} className="menu-section">
-              <h2 className="menu-section-title">{category}s</h2>
-              <div className="menu-category-label">{category}</div>
+            <div
+              key={category}
+              className="menu-section"
+              ref={(el) => (sectionRefs.current[category] = el)}
+            >
+              <h2 className="menu-section-title">{category}</h2>
               {items.map((item) => {
-                const cartEntry = cart.find((e) => e.item_id === item.item_id);
+                const totalQty = cart
+                  .filter((e) => e.item.docId === item.docId)
+                  .reduce((s, e) => s + e.qty, 0);
                 return (
                   <button
                     key={item.item_id}
                     className={`menu-item${!item.availability ? " menu-item--unavailable" : ""}`}
-                    onClick={() => item.availability && handleAddToCart(item)}
+                    onClick={() => item.availability && setPopup({ item })}
                     disabled={!item.availability}
-                    aria-disabled={!item.availability}
                   >
                     <img
                       src={item.image_url || PLACEHOLDER}
@@ -166,8 +151,8 @@ export default function MenuPage() {
                     <div className="menu-item-info">
                       <span className="menu-item-name">
                         {item.m_name}
-                        {cartEntry && (
-                          <span className="menu-item-qty-badge">×{cartEntry.qty}</span>
+                        {totalQty > 0 && (
+                          <span className="cart-badge">{totalQty}</span>
                         )}
                       </span>
                       {item.description && (
@@ -184,22 +169,26 @@ export default function MenuPage() {
           ))}
         </div>
 
-        {/* ── Sticky footer ── */}
         <div className="menu-footer">
-          <span className="menu-footer-total">
-            Total: <strong>{peso(cartTotal)}</strong>
-          </span>
           <button
             className="btn-checkout"
             disabled={cart.length === 0}
             onClick={() => navigate("/checkout/cart", { state: { cart } })}
           >
             Checkout
-            {cartCount > 0 && (
-              <span className="cart-badge">{cartCount}</span>
-            )}
+            {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
           </button>
         </div>
+
+        {popup && (
+          <ItemPopup
+            item={popup.item}
+            addons={addons}
+            dips={dips}
+            onClose={() => setPopup(null)}
+            onAddToCart={handleAddToCart}
+          />
+        )}
       </div>
     </div>
   );
