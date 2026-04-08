@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import { ADD_ONS, DIP_TIERS } from "../assets/data/menuData.js";
 import "../css/PopUp.css";
 
 const peso = (n) =>
@@ -8,24 +7,27 @@ const peso = (n) =>
 const PLACEHOLDER =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='%23d1d5db'/%3E%3C/svg%3E";
 
-const IS_DRINK   = (item) => item.category?.toLowerCase() === "drink";
-const IS_CHURROS = (item) => item.m_name?.toLowerCase().includes("churro");
+const IS_DRINK   = (item) => item?.category?.toLowerCase() === "drink";
+const IS_CHURROS = (item) => item?.m_name?.toLowerCase().includes("churros");
 
-export default function ItemPopup({ item, onClose, onAddToCart }) {
-  const [qty, setQty]     = useState(1);
-  const [addons, setAddons] = useState({});
-  const [dipSelections, setDipSelections] = useState(() => {
-    const init = {};
-    DIP_TIERS.forEach((tier) => {
-      if (!tier.required) {
-        const noneOpt = tier.options.find((o) => o.id === "none");
-        if (noneOpt) init[tier.id] = "none";
-      }
-    });
-    return init;
+export default function ItemPopup({ item, existing, addons, dips, onClose, onAddToCart }) {
+  const [qty, setQty] = useState(existing?.qty ?? 1);
+  const [selectedAddons, setSelectedAddons] = useState(() => {
+    const map = {};
+    (existing?.addons ?? []).forEach((a) => { map[a.docId] = true; });
+    return map;
   });
+  const [selectedDip, setSelectedDip] = useState(
+    () => existing?.dips?.[0]?.docId ?? null
+  );
+
+  useEffect(() => {
+    if (existing) setQty(existing.qty);
+  }, [existing?.qty]);
 
   const overlayRef = useRef();
+  const isDrink   = IS_DRINK(item);
+  const isChurros = IS_CHURROS(item);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -36,61 +38,43 @@ export default function ItemPopup({ item, onClose, onAddToCart }) {
     if (e.target === overlayRef.current) onClose();
   };
 
-  const toggleAddon = (id) =>
-    setAddons((prev) => ({ ...prev, [id]: !prev[id] }));
-
-  const setDip = (tierId, optionId) =>
-    setDipSelections((prev) => ({ ...prev, [tierId]: optionId }));
-
-  const isDrink   = IS_DRINK(item);
-  const isChurros = IS_CHURROS(item);
+  const toggleAddon = (docId) =>
+    setSelectedAddons((prev) => ({ ...prev, [docId]: !prev[docId] }));
 
   const addonTotal = isDrink
-    ? ADD_ONS.filter((a) => addons[a.id]).reduce((s, a) => s + a.price, 0)
+    ? addons.filter((a) => selectedAddons[a.docId]).reduce((s, a) => s + a.price, 0)
     : 0;
 
-  const dipTotal = isChurros
-    ? DIP_TIERS.reduce((sum, tier) => {
-        const chosen = tier.options.find((o) => o.id === dipSelections[tier.id]);
-        return sum + (chosen ? chosen.price : 0);
-      }, 0)
+  const dipTotal = isChurros && selectedDip
+    ? (dips.find((d) => d.docId === selectedDip)?.price ?? 0)
     : 0;
 
   const lineTotal = (item.price + addonTotal + dipTotal) * qty;
-
-  const dipsValid = !isChurros || DIP_TIERS.every(
-    (tier) => !tier.required || dipSelections[tier.id]
-  );
+  const dipsValid = !isChurros || selectedDip !== null;
 
   const handleAdd = () => {
     if (!dipsValid) return;
     onAddToCart({
-      item,
-      serve: null,
-      qty,
-      addons: isDrink ? ADD_ONS.filter((a) => addons[a.id]) : [],
-      dips: isChurros
-        ? DIP_TIERS.map((tier) => ({
-            tier: tier.label,
-            chosen: tier.options.find((o) => o.id === dipSelections[tier.id]),
-          })).filter((d) => d.chosen && d.chosen.id !== "none")
+        item,
+        qty,
+        addons: isDrink ? addons.filter((a) => selectedAddons[a.docId]) : [],
+        dips:   isChurros && selectedDip
+        ? [dips.find((d) => d.docId === selectedDip)]
         : [],
-      lineTotal,
+        lineTotal,
     });
     onClose();
-  };
+    };
 
   return (
     <div className="popup-overlay" ref={overlayRef} onClick={handleOverlayClick}>
       <div className="popup">
 
-        {/* Header */}
         <div className="popup-header">
           <h2 className="popup-name">{item.m_name}</h2>
           <span className="popup-price-tag"><strong>{peso(item.price)}</strong></span>
         </div>
 
-        {/* Image */}
         <div className="popup-img-wrap">
           <img src={item.image_url || PLACEHOLDER} alt={item.m_name} className="popup-img" />
         </div>
@@ -106,19 +90,19 @@ export default function ItemPopup({ item, onClose, onAddToCart }) {
         </div>
 
         {/* Add-ons — drinks only */}
-        {isDrink && (
+        {isDrink && addons.length > 0 && (
           <div className="popup-section">
             <div className="popup-section-label">Add-ons</div>
             <div className="popup-addons">
-              {ADD_ONS.map((addon) => (
-                <label key={addon.id} className="addon-row">
+              {addons.map((addon) => (
+                <label key={addon.docId} className="addon-row">
                   <input
                     type="checkbox"
-                    checked={!!addons[addon.id]}
-                    onChange={() => toggleAddon(addon.id)}
+                    checked={!!selectedAddons[addon.docId]}
+                    onChange={() => toggleAddon(addon.docId)}
                     className="addon-checkbox"
                   />
-                  <span className="addon-label">{addon.label}</span>
+                  <span className="addon-label">{addon.m_name}</span>
                   <span className="addon-price">+{peso(addon.price)}</span>
                 </label>
               ))}
@@ -127,33 +111,31 @@ export default function ItemPopup({ item, onClose, onAddToCart }) {
         )}
 
         {/* Dips — churros only */}
-        {isChurros && DIP_TIERS.map((tier) => (
-          <div key={tier.id} className="popup-section">
+        {isChurros && dips.length > 0 && (
+          <div className="popup-section">
             <div className="popup-section-label">
-              {tier.label}
-              {tier.required && <span className="dip-required"> *</span>}
+              Dip <span className="dip-required">*</span>
             </div>
             <div className="popup-dips">
-              {tier.options.map((opt) => (
-                <label key={opt.id} className="dip-row">
+              {dips.map((dip) => (
+                <label key={dip.docId} className="dip-row">
                   <input
                     type="radio"
-                    name={tier.id}
-                    checked={dipSelections[tier.id] === opt.id}
-                    onChange={() => setDip(tier.id, opt.id)}
+                    name="dip"
+                    checked={selectedDip === dip.docId}
+                    onChange={() => setSelectedDip(dip.docId)}
                     className="dip-radio"
                   />
-                  <span className="addon-label">{opt.label}</span>
+                  <span className="addon-label">{dip.m_name}</span>
                   <span className="addon-price">
-                    {opt.price === 0 ? "Free" : `+${peso(opt.price)}`}
+                    {dip.price === 0 ? "Free" : `+${peso(dip.price)}`}
                   </span>
                 </label>
               ))}
             </div>
           </div>
-        ))}
+        )}
 
-        {/* Footer */}
         <div className="popup-footer">
           <span className="popup-total-label">
             Total: <strong>{peso(lineTotal)}</strong>

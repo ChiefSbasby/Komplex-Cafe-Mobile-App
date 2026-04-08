@@ -81,11 +81,23 @@ export default function PaymentType() {
         order_id:      newOrderId,
         guest_id:      guestId,
         user_id:       null,
-        items:         cart.map((e) => ({
-          name:    e.item?.m_name  ?? e.m_name  ?? "Unknown",
-          price:   e.item?.price   ?? e.price   ?? 0,
-          qty:     e.qty           ?? 1,
-        })),
+        items: cart.flatMap((e) => [
+          {
+            name:  e.item?.m_name ?? "Unknown",
+            price: e.item?.price  ?? 0,
+            qty:   e.qty          ?? 1,
+          },
+          ...(e.addons ?? []).map((a) => ({
+            name:  a.m_name ?? "Unknown",
+            price: a.price  ?? 0,
+            qty:   e.qty    ?? 1,
+          })),
+          ...(e.dips ?? []).map((d) => ({
+            name:  d.m_name ?? "Unknown",
+            price: d.price  ?? 0,
+            qty:   e.qty    ?? 1,
+          })),
+        ]),
         total_amount:  totalAmount,
         order_status:  paymentType === 1 ? "PROCESSING PAYMENT" : "PENDING",
         order_type:    orderType ?? null,

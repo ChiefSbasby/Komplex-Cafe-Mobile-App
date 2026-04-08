@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import "../css/PopUp.css";
+import "../css/CheckoutEditItem.css";
 
 const peso = (n) =>
   "₱" + Number(n).toLocaleString("en-PH", { minimumFractionDigits: 2 });
@@ -7,17 +8,28 @@ const peso = (n) =>
 const PLACEHOLDER =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='%23d1d5db'/%3E%3C/svg%3E";
 
-const IS_DRINK   = (item) => item.category?.toLowerCase() === "drink";
-const IS_CHURROS = (item) => item.m_name?.toLowerCase().includes("churro");
+const IS_DRINK   = (item) => item?.category?.toLowerCase() === "drink";
+const IS_CHURROS = (item) => item?.m_name?.toLowerCase().includes("churros");
 
-export default function ItemPopup({ item, addons, dips, onClose, onAddToCart }) {
-  const [qty, setQty]           = useState(1);
-  const [selectedAddons, setSelectedAddons] = useState({});
-  const [selectedDip, setSelectedDip]       = useState(null);
-
-  const overlayRef = useRef();
+export default function EditItem({ entry, entryIndex, addons, dips, onClose, onSave }) {
+  const { item } = entry;
+  if (!item) return null;
   const isDrink   = IS_DRINK(item);
   const isChurros = IS_CHURROS(item);
+
+  const [qty, setQty] = useState(entry.qty ?? 1);
+
+  const [selectedAddons, setSelectedAddons] = useState(() => {
+    const map = {};
+    (entry.addons ?? []).forEach((a) => { map[a.docId] = true; });
+    return map;
+  });
+
+  const [selectedDip, setSelectedDip] = useState(
+    () => entry.dips?.[0]?.docId ?? null
+  );
+
+  const overlayRef = useRef();
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -42,23 +54,24 @@ export default function ItemPopup({ item, addons, dips, onClose, onAddToCart }) 
   const lineTotal = (item.price + addonTotal + dipTotal) * qty;
   const dipsValid = !isChurros || selectedDip !== null;
 
-  const handleAdd = () => {
+  const handleSave = () => {
     if (!dipsValid) return;
-    onAddToCart({
-      item,
+    onSave({
+      ...entry,
       qty,
       addons: isDrink ? addons.filter((a) => selectedAddons[a.docId]) : [],
       dips:   isChurros && selectedDip
         ? [dips.find((d) => d.docId === selectedDip)]
         : [],
       lineTotal,
-    });
+    }, entryIndex);
     onClose();
   };
 
   return (
     <div className="popup-overlay" ref={overlayRef} onClick={handleOverlayClick}>
-      <div className="popup">
+      <div className="popup edit-popup">
+        <div className="edit-popup-badge">Editing Item</div>
 
         <div className="popup-header">
           <h2 className="popup-name">{item.m_name}</h2>
@@ -69,7 +82,6 @@ export default function ItemPopup({ item, addons, dips, onClose, onAddToCart }) 
           <img src={item.image_url || PLACEHOLDER} alt={item.m_name} className="popup-img" />
         </div>
 
-        {/* Quantity */}
         <div className="popup-section">
           <div className="popup-section-label">Quantity</div>
           <div className="popup-qty-row">
@@ -79,7 +91,6 @@ export default function ItemPopup({ item, addons, dips, onClose, onAddToCart }) 
           </div>
         </div>
 
-        {/* Add-ons — drinks only */}
         {isDrink && addons.length > 0 && (
           <div className="popup-section">
             <div className="popup-section-label">Add-ons</div>
@@ -100,7 +111,6 @@ export default function ItemPopup({ item, addons, dips, onClose, onAddToCart }) 
           </div>
         )}
 
-        {/* Dips — churros only */}
         {isChurros && dips.length > 0 && (
           <div className="popup-section">
             <div className="popup-section-label">
@@ -111,7 +121,7 @@ export default function ItemPopup({ item, addons, dips, onClose, onAddToCart }) 
                 <label key={dip.docId} className="dip-row">
                   <input
                     type="radio"
-                    name="dip"
+                    name="edit-dip"
                     checked={selectedDip === dip.docId}
                     onChange={() => setSelectedDip(dip.docId)}
                     className="dip-radio"
@@ -131,14 +141,13 @@ export default function ItemPopup({ item, addons, dips, onClose, onAddToCart }) 
             Total: <strong>{peso(lineTotal)}</strong>
           </span>
           <button
-            className="btn-add-item"
-            onClick={handleAdd}
+            className="btn-add-item btn-save-item"
+            onClick={handleSave}
             disabled={!dipsValid}
           >
-            Add Item
+            Save Changes
           </button>
         </div>
-
       </div>
     </div>
   );

@@ -14,9 +14,23 @@ export default function CheckoutPage_1() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [cart, setCart] = useState(
-    (location.state?.cart ?? []).map((e) => ({ ...e, qty: e.qty ?? 1 }))
-  );
+  const [cart, setCart] = useState(() =>
+  (location.state?.cart ?? []).map((e) => ({
+    ...e,
+    qty: e.qty ?? 1,
+    // If item is missing, the entry itself is the flat item (old shape)
+    item: e.item ?? {
+      m_name:     e.m_name,
+      price:      e.price,
+      category:   e.category,
+      image_url:  e.image_url,
+      docId:      e.docId,
+    },
+    addons: e.addons ?? [],
+    dips:   e.dips   ?? [],
+    lineTotal: e.lineTotal ?? (e.price * (e.qty ?? 1)),
+  }))
+);
   const [editTarget, setEditTarget] = useState(null);
   const [addons, setAddons] = useState([]);
   const [dips, setDips]     = useState([]);

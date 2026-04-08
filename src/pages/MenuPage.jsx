@@ -67,20 +67,12 @@ export default function MenuPage() {
 
   const handleAddToCart = (entry) => {
     setCart((prev) => {
-      const key = JSON.stringify({
-        docId:  entry.item.docId,
-        addons: entry.addons.map((a) => a.docId),
-        dips:   entry.dips.map((d) => d.docId),
-      });
-      const existing = prev.findIndex((e) => e._key === key);
-      if (existing !== -1) {
-        return prev.map((e, i) =>
-          i === existing
-            ? { ...e, qty: e.qty + entry.qty, lineTotal: e.lineTotal + entry.lineTotal }
-            : e
-        );
+      const index = prev.findIndex((e) => e.item.docId === entry.item.docId);
+      if (index !== -1) {
+        // Replace the existing entry entirely
+        return prev.map((e, i) => i === index ? entry : e);
       }
-      return [...prev, { ...entry, _key: key }];
+      return [...prev, entry];
     });
     setPopup(null);
   };
@@ -133,28 +125,26 @@ export default function MenuPage() {
             >
               <h2 className="menu-section-title">{category}</h2>
               {items.map((item) => {
-                const totalQty = cart
-                  .filter((e) => e.item.docId === item.docId)
-                  .reduce((s, e) => s + e.qty, 0);
+                const existing = cart.find((e) => e.item.docId === item.docId);
+                const totalQty = existing?.qty ?? 0;
                 return (
                   <button
                     key={item.item_id}
                     className={`menu-item${!item.availability ? " menu-item--unavailable" : ""}`}
-                    onClick={() => item.availability && setPopup({ item })}
+                    onClick={() => {
+                      if (!item.availability) return;
+                      setPopup({ item, existing: existing ?? null });
+                    }}
                     disabled={!item.availability}
                   >
+                    {totalQty > 0 && <span className="cart-badge">{totalQty}</span>}
                     <img
                       src={item.image_url || PLACEHOLDER}
                       alt={item.m_name}
                       className="menu-item-img"
                     />
                     <div className="menu-item-info">
-                      <span className="menu-item-name">
-                        {item.m_name}
-                        {totalQty > 0 && (
-                          <span className="cart-badge">{totalQty}</span>
-                        )}
-                      </span>
+                      <span className="menu-item-name">{item.m_name}</span>
                       {item.description && (
                         <span className="menu-item-desc">{item.description}</span>
                       )}
