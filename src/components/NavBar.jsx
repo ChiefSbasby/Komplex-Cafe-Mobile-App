@@ -44,7 +44,7 @@ export default function NavBar() {
 
         <button className="nav_homeLogo" onClick={() => navigate("/")}>
           <div className="nav_logo">
-            <img alt="Komplex Cafe" src={PLACEHOLDER}></img>
+            <img alt="Komplex Cafe" src="src\assets\komplexLogoPlain.png"></img>
           </div>
         </button>
       </div>
