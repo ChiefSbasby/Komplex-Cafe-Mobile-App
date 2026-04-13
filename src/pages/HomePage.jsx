@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+
 import { useNavigate } from "react-router-dom";
 import "../css/Fonts.css";
 import "../css/HomePage.css";
@@ -14,7 +16,14 @@ const HOURS = [
 
 const HomePage = () => {
 
+  const [searchParams] = useSearchParams();
 
+  useEffect(() => {
+    const tableId = searchParams.get("table_id");
+    if (tableId) {
+      sessionStorage.setItem("table_id", tableId);
+    }
+  }, []);
   const navigate = useNavigate();
   return (
     <div className="wrapper">

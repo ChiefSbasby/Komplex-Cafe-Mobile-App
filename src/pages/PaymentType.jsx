@@ -39,7 +39,7 @@ export default function PaymentType() {
   const [showReceiptPopup, setShowReceiptPopup] = useState(false);
 
   const totalAmount = cart.reduce((s, e) => s + e.lineTotal, 0);
-
+  const tableId = sessionStorage.getItem("table_id");
   /* ── Core Firestore write (shared by both payment types) ── */
   const submitOrder = async (paymentType, receiptUrl = "") => {
     const existingGuestId = getSessionGuestId();
@@ -103,7 +103,7 @@ export default function PaymentType() {
         order_type:    orderType ?? null,
         receive_at:    receiveAt ?? null,
         special_instructions:  instructions || null,
-        table_id:      null,
+        table_id:      tableId ? Number(tableId) : null,
         receipt_image: receiptUrl,
         o_timestamp:   serverTimestamp(),
       }));
