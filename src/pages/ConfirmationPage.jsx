@@ -46,6 +46,8 @@ const FALLBACK = {
   sub:    "Please save this reference number to claim your order.",
 };
 
+
+
 export default function ConfirmationPage() {
   const location  = useLocation();
   const { orderId, paymentId } = location.state ?? {};
@@ -60,7 +62,13 @@ export default function ConfirmationPage() {
     const orderRef = doc(db, "tbl_orders", String(orderId));
     const unsub = onSnapshot(orderRef, (snap) => {
       if (!snap.exists()) return;
-      setOrderStatus(snap.data().order_status ?? null);
+      const status = snap.data().order_status ?? null;
+      setOrderStatus(status);
+r
+      // Clear active order from session when done
+      if (status === "COMPLETED" || status === "CANCELLED") {
+        sessionStorage.removeItem("active_order_id");
+      }
     });
 
     return () => unsub();

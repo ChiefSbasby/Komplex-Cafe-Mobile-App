@@ -22,10 +22,10 @@
 /* ─── Hero banner ───────────────────────────────────────────── */
 .menu-header{
   position: fixed;
+  width: 100%;
   z-index: 99;
 }
 .menu-hero {
-  position: inherit;
   font-family: 'gliker', sans-serif;
   width: 100%;
   
@@ -40,7 +40,6 @@
 
 /* ─── Category chips ─────────────────────────────────────────── */
 .menu-chips-wrap {
-  position: inherit;
   top: 154px;
   background: #fff;
   width: 100%;
@@ -240,6 +239,7 @@
 
 /* ─── Responsive ─────────────────────────────────────────────── */
 @media (min-width: 501px) {
+  .menu-header{ max-width: 1000px }
   .menu-page   { max-width: 100%; }
   .menu-footer { max-width: 100%; }
 }

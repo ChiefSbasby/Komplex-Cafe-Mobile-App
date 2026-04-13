@@ -28,7 +28,7 @@ export default function CheckoutPage_1() {
     },
     addons: e.addons ?? [],
     dips:   e.dips   ?? [],
-    lineTotal: e.lineTotal ?? (e.price * (e.qty ?? 1)),
+    lineTotal: e.lineTotal ?? ((e.item.e.price ?? e.price ?? 0) * (e.qty ?? 1)),
   }))
 );
   const [editTarget, setEditTarget] = useState(null);

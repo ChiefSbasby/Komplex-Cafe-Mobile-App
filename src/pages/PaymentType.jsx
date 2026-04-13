@@ -140,6 +140,7 @@ export default function PaymentType() {
     if (isNewGuest) {
       sessionStorage.setItem("guest_id", String(guestId));
     }
+    sessionStorage.setItem("active_order_id", String(newOrderId)); // ← add this
 
     return { newOrderId, newPaymentId };
   };

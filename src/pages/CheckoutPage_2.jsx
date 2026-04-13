@@ -13,7 +13,7 @@ export default function CheckoutPage_2() {
     const navigate = useNavigate();
 
     const cart = location.state?.cart ?? [];
-    const cartTotal = cart.reduce((s, e) => s + e.price * e.qty, 0);
+    const cartTotal = cart.reduce((s, e) => s + e.lineTotal, 0);
 
     /* ── Form state ── */
     const [orderType,    setOrderType]    = useState(null);  // "dine_in" | "take_out"
